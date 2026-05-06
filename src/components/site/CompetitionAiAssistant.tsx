@@ -44,11 +44,15 @@ const normalizeError = (error: unknown) => {
   const message = error instanceof Error ? error.message : String(error);
 
   if (/Failed to fetch/i.test(message)) {
-    return "未连接到问答代理，请先启动 `npm run proxy`，再确认前端页面仍在运行。";
+    return "问答接口不可达。若为本地开发，请先启动 `npm run proxy`；若为线上环境，请确认已部署 `/api/deepseek/chat`。";
+  }
+
+  if (/404/.test(message)) {
+    return "未找到问答接口 `/api/deepseek/chat`，请确认 Vercel 已部署最新代码。";
   }
 
   if (/500/.test(message)) {
-    return "代理接口已连接，但服务端没有拿到可用配置，请检查 `.env` 和代理进程。";
+    return "问答接口已连接，但服务端配置异常。请检查 `DEEPSEEK_API_KEY` 等环境变量。";
   }
 
   return message;
